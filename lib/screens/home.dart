@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import '../constants/colors.dart';
 import '../widgets/todoitem.dart';
 import '../model/todomodel.dart';
@@ -29,7 +28,7 @@ class TodoService {
 }
 
 class Home extends StatefulWidget {
-  Home({super.key});
+  const Home({super.key});
 
   @override
   State<Home> createState() => _HomeState();
@@ -51,6 +50,12 @@ class _HomeState extends State<Home> {
 
   void loadTodos() async {
     List<Todo> loadedTodos = await todoService.loadTodos();
+    if (loadedTodos.isEmpty) {
+      // If there are no todos loaded, set the default task
+      loadedTodos = Todo.todolist();
+      todoService.saveTodos(
+          loadedTodos); // Save the default task to Shared Preferences
+    }
     setState(() {
       foundtodo = loadedTodos;
     });
@@ -60,34 +65,36 @@ class _HomeState extends State<Home> {
     setState(() {
       todo.isdone = !todo.isdone!;
     });
+    todoService.saveTodos(foundtodo); // Save after changing the todo
   }
 
   void deletetodo(String id) {
     setState(() {
-      todosList.removeWhere((item) => item.id == id);
       foundtodo.removeWhere((item) => item.id == id);
     });
-    todoService.saveTodos(todosList); // Save the updated todosList
+    todoService.saveTodos(foundtodo); // Save the updated foundtodo list
   }
 
   void addtodo(String title) {
-    setState(() {
-      foundtodo.add(Todo(
+    if (title.isNotEmpty) {
+      setState(() {
+        foundtodo.add(Todo(
           id: DateTime.now().microsecondsSinceEpoch.toString(),
           todotext: title,
-          isdone: false));
-      todocontroller.clear();
-    });
-    todoService.saveTodos(todosList);
+          isdone: false,
+        ));
+        todocontroller.clear();
+      });
+      todoService.saveTodos(foundtodo); // Save the updated foundtodo list
+    }
   }
 
   void runfilter(String words) {
-    // ignore: unused_local_variable
     List<Todo> results = [];
     if (words.isEmpty) {
-      results = todosList;
+      results = foundtodo; // Filter based on the currently displayed list
     } else {
-      results = todosList
+      results = foundtodo
           .where((item) =>
               item.todotext!.toLowerCase().contains(words.toLowerCase()))
           .toList();
