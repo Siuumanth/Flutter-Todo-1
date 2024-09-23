@@ -1,6 +1,6 @@
 # todoapp2
 
-A new Flutter project.
+A simple ToDo tracker flutter app
 
 ## Getting Started
 
