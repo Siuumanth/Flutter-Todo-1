@@ -1,6 +1,6 @@
-# todoapp2
+# todoapp
 
-A simple ToDo tracker flutter app
+A ToDo tracker flutter app
 
 ## Getting Started
 
